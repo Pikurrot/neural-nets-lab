@@ -10,10 +10,10 @@ class CNN(torch.nn.Module):
 		self.conv2 = nn.Conv2d(16, 32, 3, 1)	# (b, 32, 11, 11)
 		self.conv3 = nn.Conv2d(32, 64, 3, 1)	# (b, 64, 9, 9)
 		self.pool2 = nn.MaxPool2d(2, 2)			# (b, 64, 4, 4)
-		self.fc1 = nn.Linear(64*4*4, 128)
-		self.fc2 = nn.Linear(128, 10)		
+		self.fc1 = nn.Linear(64*4*4, 128)		# (b, 128)
+		self.fc2 = nn.Linear(128, 10)			# (b, 10)
 
-	def forward(self, x):
+	def forward(self, x: torch.Tensor):
 		x = F.relu(self.conv1(x))
 		x = self.pool1(x)
 		x = F.dropout2d(F.relu(self.conv2(x)), p=0.25)

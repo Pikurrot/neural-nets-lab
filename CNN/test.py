@@ -13,8 +13,10 @@ transform = torchvision.transforms.Compose([
 	torchvision.transforms.Normalize((0.5,), (0.5,))
 ])
 
+batch_size = 64
+
 testset = torchvision.datasets.FashionMNIST(root=DATA_PATH, train=False, download=True, transform=transform)
-testloader = DataLoader(testset, batch_size=64, shuffle=False)
+testloader = DataLoader(testset, batch_size=batch_size, shuffle=False)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", device)
@@ -25,13 +27,12 @@ model.eval()
 correct = 0
 total = 0
 with torch.no_grad():
-	for data in testloader:
-		inputs, labels = data
-		inputs, labels = inputs.to(device), labels.to(device)
+	for (x, y) in testloader:
+		x, y = x.to(device), y.to(device) # (b, 1, 28, 28), (b)
 
-		outputs = model(inputs)
-		_, predicted = torch.max(outputs.data, 1)
-		total += labels.size(0)
-		correct += (predicted == labels).sum().item()
+		logits = model(x) # (b, 10)
+		_, y_pred = torch.max(logits, 1) # (b,)
+		total += y.size(0)
+		correct += (y_pred == y).sum().item()
 
 print(f"Accuracy: {100 * correct / total}%")
