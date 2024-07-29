@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import DataLoader
 import dotenv
 import os
+import numpy as np
 from model import RNN, ShakespeareDataset
 
 dotenv.load_dotenv()
@@ -42,12 +43,29 @@ with torch.no_grad():
 
 print(f"Accuracy: {100 * correct / total}%")
 
-print("Some example predictions:")
-for i in range(1):
-	print("-> Input:")
-	print("".join([testset.idx2char[j.item()] for j in x[i]]))
-	print("-> Ground truth:")
-	print("".join([testset.idx2char[j.item()] for j in y[i]]))
-	print("-> Prediction:")
-	print("".join([testset.idx2char[j.item()] for j in y_pred[i]]))
-	print()
+# Text generation
+text = "ROMEO:"
+next_chars = 1000
+
+chars = [char for char in text]
+state = model.init_hidden(1).to(device) # (n_layers, 1, embedding_dim)
+
+x = torch.tensor([testset.char2idx[char] for char in chars]) # (text_len,)
+x = x.unsqueeze(0) # (1, text_len)
+x = x.to(device)
+
+for i in range(0, next_chars):
+	y_pred, state = model(x, state)
+
+	last_char_logits = y_pred[0][-1] # (vocab_size)
+	p = torch.nn.functional.softmax(last_char_logits, dim=0).detach().cpu().numpy()
+	# char_index = torch.argmax(last_char_logits).item()
+	char_idx = np.random.choice(len(last_char_logits), p=p)
+	chars.append(testset.idx2char[char_idx])
+
+	# the output of the model (a single character index) becomes the input at next iteration
+	x = torch.tensor([[char_idx]]) # (1, 1)
+	x = x.to(device)
+
+print("Example prediction:")
+print("".join(chars))
