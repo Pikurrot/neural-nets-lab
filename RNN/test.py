@@ -54,18 +54,19 @@ x = torch.tensor([testset.char2idx[char] for char in chars]) # (text_len,)
 x = x.unsqueeze(0) # (1, text_len)
 x = x.to(device)
 
-for i in range(0, next_chars):
-	y_pred, state = model(x, state)
+with torch.no_grad():
+	for i in range(0, next_chars):
+		y_pred, state = model(x, state)
 
-	last_char_logits = y_pred[0][-1] # (vocab_size)
-	p = torch.nn.functional.softmax(last_char_logits, dim=0).detach().cpu().numpy()
-	# char_index = torch.argmax(last_char_logits).item()
-	char_idx = np.random.choice(len(last_char_logits), p=p)
-	chars.append(testset.idx2char[char_idx])
+		last_char_logits = y_pred[0][-1] # (vocab_size)
+		p = torch.nn.functional.softmax(last_char_logits, dim=0).detach().cpu().numpy()
+		# char_index = torch.argmax(last_char_logits).item()
+		char_idx = np.random.choice(len(last_char_logits), p=p)
+		chars.append(testset.idx2char[char_idx])
 
-	# the output of the model (a single character index) becomes the input at next iteration
-	x = torch.tensor([[char_idx]]) # (1, 1)
-	x = x.to(device)
+		# the output of the model (a single character index) becomes the input at next iteration
+		x = torch.tensor([[char_idx]]) # (1, 1)
+		x = x.to(device)
 
 print("Example prediction:")
 print("".join(chars))
