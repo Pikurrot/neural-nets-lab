@@ -11,6 +11,7 @@ seq_len = 100
 batch_size = 256
 
 trainset = ShakespeareDataset(DATA_PATH, seq_len, train=True, train_frac=0.8)
+trainset.save_mapping("mapping.pt")
 trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
 
 input_dim = trainset.vocab_size
@@ -28,7 +29,7 @@ criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
 losses = []
-for epoch in range(10):
+for epoch in range(20):
 	for i, (x, y) in enumerate(trainloader):
 		this_batch_size = x.shape[0] # Last batch may have different size
 		state = model.init_hidden(this_batch_size) # (n_layers, b, embedding_dim), (n_layers, b, embedding_dim)

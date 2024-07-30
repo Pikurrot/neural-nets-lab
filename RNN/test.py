@@ -9,9 +9,10 @@ dotenv.load_dotenv()
 DATA_PATH = os.path.join(os.getenv("DATA_PATH"), "shakespeare.txt")
 	
 seq_len = 100
-batch_size = 64
+batch_size = 256
 
 testset = ShakespeareDataset(DATA_PATH, seq_len, train=False, train_frac=0.8)
+testset.load_mapping("mapping.pt")
 testloader = DataLoader(testset, batch_size=batch_size, shuffle=False)
 
 input_dim = testset.vocab_size

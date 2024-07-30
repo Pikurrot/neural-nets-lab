@@ -8,9 +8,10 @@ dotenv.load_dotenv()
 DATA_PATH = os.path.join(os.getenv("DATA_PATH"), "shakespeare.txt")
 	
 seq_len = 100
-batch_size = 64
+batch_size = 256
 
 trainset = ShakespeareDataset(DATA_PATH, seq_len, train=True, train_frac=0.8)
+trainset.save_mapping("mapping.pt")
 trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
 
 input_dim = trainset.vocab_size

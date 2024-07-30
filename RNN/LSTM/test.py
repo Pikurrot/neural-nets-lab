@@ -12,11 +12,12 @@ seq_len = 100
 batch_size = 256
 
 testset = ShakespeareDataset(DATA_PATH, seq_len, train=False, train_frac=0.8)
+testset.load_mapping("mapping.pt")
 testloader = DataLoader(testset, batch_size=batch_size, shuffle=False)
 
 input_dim = testset.vocab_size
 embedding_dim = 300
-hidden_dim = 2048
+hidden_dim = 1024
 output_dim = testset.vocab_size
 n_layers = 2
 drop_prob = 0.2

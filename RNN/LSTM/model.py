@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset
+from typing import Optional
 
 class LSTM(torch.nn.Module):
 	def __init__(
@@ -35,7 +36,14 @@ class LSTM(torch.nn.Module):
 
 
 class ShakespeareDataset(Dataset):
-	def __init__(self, data_path: str, seq_len: int, train: bool = True, train_frac: float = 0.8):
+	def __init__(
+			self,
+			data_path: str,
+			seq_len: int,
+			train: bool = True,
+			train_frac: float = 0.8,
+			char2idx: Optional[dict] = None
+	):
 		self.seq_len = seq_len
 		with open(data_path, "r") as f:
 			full_text = f.read()
@@ -44,9 +52,12 @@ class ShakespeareDataset(Dataset):
 		else:
 			self.text = full_text[int(train_frac * len(full_text)):]
 		self.chars = list(set(full_text))
-		self.char2idx = {c: i for i, c in enumerate(self.chars)}
-		self.idx2char = {i: c for i, c in enumerate(self.chars)}
-		self.vocab_size = len(self.chars)
+		if char2idx is not None:
+			self.char2idx = char2idx
+		else:
+			self.char2idx = {c: i for i, c in enumerate(self.chars)}
+		self.idx2char = {i: c for c, i in self.char2idx.items()}
+		self.vocab_size = len(self.char2idx)
 		self.x, self.y = self.get_data()
 
 	def get_data(self):
@@ -62,3 +73,11 @@ class ShakespeareDataset(Dataset):
 	def __getitem__(self, idx: int):
 		assert ((idx >= 0) and (idx < len(self.x))), "Index out of range"
 		return self.x[idx], self.y[idx]
+	
+	def save_mapping(self, path: str):
+		torch.save(self.char2idx, path)
+
+	def load_mapping(self, path: str):
+		self.char2idx = torch.load(path)
+		self.idx2char = {i: c for c, i in self.char2idx.items()}
+		self.vocab_size = len(self.char2idx)
