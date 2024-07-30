@@ -20,11 +20,11 @@ embedding_dim = 300
 hidden_dim = 1024
 output_dim = testset.vocab_size
 n_layers = 2
-drop_prob = 0.2
+dropout = 0.2
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", device)
-model = LSTM(input_dim, embedding_dim, hidden_dim, output_dim, n_layers, drop_prob).to(device)
+model = LSTM(input_dim, embedding_dim, hidden_dim, output_dim, n_layers, dropout).to(device)
 model.load_state_dict(torch.load("model.pt"))
 model.eval()
 

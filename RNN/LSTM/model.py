@@ -11,7 +11,7 @@ class LSTM(torch.nn.Module):
 			hidden_dim: int,
 			output_dim: int,
 			n_layers: int = 1,
-			drop_prob: float = 0.0,
+			dropout: float = 0.0,
 			bidirectional: bool = False
 	):
 		super(LSTM, self).__init__()
@@ -20,7 +20,7 @@ class LSTM(torch.nn.Module):
 																	
 		self.embedding = nn.Embedding(input_dim, embedding_dim)
 		self.lstm = nn.LSTM(embedding_dim, hidden_dim, n_layers, batch_first=True,
-					dropout=drop_prob, bidirectional=bidirectional)
+					dropout=dropout, bidirectional=bidirectional)
 		self.fc = nn.Linear(hidden_dim, output_dim)
 
 	def init_hidden(self, batch_size: int):

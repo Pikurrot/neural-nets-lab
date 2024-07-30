@@ -19,12 +19,12 @@ embedding_dim = 300
 hidden_dim = 1024
 output_dim = trainset.vocab_size
 n_layers = 2
-drop_prob = 0.2
+dropout = 0.2
 lr = 0.001
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", device)
-model = RNN(input_dim, embedding_dim, hidden_dim, output_dim, n_layers, drop_prob).to(device)
+model = RNN(input_dim, embedding_dim, hidden_dim, output_dim, n_layers, dropout).to(device)
 criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
